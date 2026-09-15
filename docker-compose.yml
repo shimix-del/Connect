@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  aero-and-stay:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aero_and_stay_app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    volumes:
+      - ./data:/app/.data

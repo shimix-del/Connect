@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { BookingRequest, BookingStatus } from '@/types';
 import { 
@@ -27,7 +27,7 @@ export default function BookingTrackerPage() {
   const [showMpesa, setShowMpesa] = useState(false);
   const [showCard, setShowCard] = useState(false);
 
-  const fetchBooking = async (silent = false) => {
+  const fetchBooking = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
     setError('');
 
@@ -46,13 +46,13 @@ export default function BookingTrackerPage() {
       if (!silent) setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, [code]);
 
   useEffect(() => {
     if (code) {
       fetchBooking();
     }
-  }, [code]);
+  }, [code, fetchBooking]);
 
   const handleRefresh = () => {
     setRefreshing(true);
