@@ -8,6 +8,7 @@ import {
   Sparkles, ShieldCheck, Clock, ExternalLink, Save, Luggage, QrCode
 } from 'lucide-react';
 import { formatKES, formatUSD, getStatusBadge, generateWhatsAppLink } from '@/lib/utils';
+import { quoteBookingApi, updateBookingApi } from '@/lib/apiClient';
 
 interface Props {
   booking: BookingRequest;
@@ -67,24 +68,21 @@ export default function RequestDrawer({ booking, onClose, onUpdate }: Props) {
     setNotificationMsg('');
 
     try {
-      const res = await fetch(`/api/bookings/${booking.id}/quote`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          flightPriceKES,
-          bnbPriceKES,
-          conciergeFeeKES,
-          quotedAirline,
-          quotedStayName,
-          quoteNotes,
-          validHours,
-          adminNotes,
-        }),
+      const data = await quoteBookingApi(booking.id, {
+        flightPriceKES: Number(flightPriceKES),
+        bnbPriceKES: Number(bnbPriceKES),
+        conciergeFeeKES: Number(conciergeFeeKES),
+        totalPriceKES: totalKES,
+        totalPriceUSD: totalUSD,
+        quotedAirline,
+        quotedStayName,
+        quoteNotes,
+        validUntil: new Date(Date.now() + validHours * 3600000).toISOString(),
+        sentAt: new Date().toISOString(),
       });
 
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.message || 'Failed to dispatch quote.');
+      if (!data.success || !data.booking) {
+        throw new Error('Failed to dispatch quote.');
       }
 
       onUpdate(data.booking);
@@ -104,31 +102,26 @@ export default function RequestDrawer({ booking, onClose, onUpdate }: Props) {
     setNotificationMsg('');
 
     try {
-      const res = await fetch(`/api/bookings/${booking.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          status: 'confirmed',
-          adminNotes,
-          itinerary: {
-            airlineBookingRef: airlineRef,
-            flightDetailsSummary: `${booking.flightOrigin || 'NBO'} ➔ ${booking.flightDestination || 'Stay'}`,
-            departureTerminal: terminal,
-            baggageAllowance: baggage,
-            stayConfirmationRef: stayRef,
-            stayAddress: `${booking.flightDestination || 'Coast'}, Kenya`,
-            checkInInstructions: checkInGuide,
-            hostContactPhone: hostPhone,
-            conciergeLeadName: 'Jerry (Head Concierge)',
-            conciergeLeadPhone: '+254 700 000 000',
-            confirmedAt: new Date().toISOString(),
-          },
-        }),
+      const data = await updateBookingApi(booking.id, {
+        status: 'confirmed',
+        adminNotes,
+        itinerary: {
+          airlineBookingRef: airlineRef,
+          flightDetailsSummary: `${booking.flightOrigin || 'NBO'} ➔ ${booking.flightDestination || 'Stay'}`,
+          departureTerminal: terminal,
+          baggageAllowance: baggage,
+          stayConfirmationRef: stayRef,
+          stayAddress: `${booking.flightDestination || 'Coast'}, Kenya`,
+          checkInInstructions: checkInGuide,
+          hostContactPhone: hostPhone,
+          conciergeLeadName: 'Jerry (Head Concierge)',
+          conciergeLeadPhone: '+254 700 000 000',
+          confirmedAt: new Date().toISOString(),
+        },
       });
 
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.message || 'Failed to save itinerary.');
+      if (!data.success || !data.booking) {
+        throw new Error('Failed to save itinerary.');
       }
 
       onUpdate(data.booking);
@@ -145,13 +138,8 @@ export default function RequestDrawer({ booking, onClose, onUpdate }: Props) {
   const handleStatusChange = async (newStatus: BookingStatus) => {
     setSaving(true);
     try {
-      const res = await fetch(`/api/bookings/${booking.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus, adminNotes }),
-      });
-      const data = await res.json();
-      if (data.success) {
+      const data = await updateBookingApi(booking.id, { status: newStatus, adminNotes });
+      if (data.success && data.booking) {
         setStatus(newStatus);
         onUpdate(data.booking);
       }

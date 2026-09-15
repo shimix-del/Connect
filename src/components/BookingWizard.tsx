@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { Route, BnBListing, BookingType } from '@/types';
 import { formatKES, formatUSD } from '@/lib/utils';
+import { fetchRoutes, fetchStays, createBookingApi } from '@/lib/apiClient';
 import confetti from 'canvas-confetti';
 
 interface Props {
@@ -35,6 +36,7 @@ export default function BookingWizard({ initialType = 'flight_and_bnb', initialR
   const [stays, setStays] = useState<BnBListing[]>([]);
 
   // Form State - Flight
+  const [selectedRouteId, setSelectedRouteId] = useState(initialRouteId || '');
   const [flightOrigin, setFlightOrigin] = useState('Nairobi Wilson (WIL)');
   const [flightDestination, setFlightDestination] = useState('Diani Beach / Ukunda (UKA)');
   const [flightDate, setFlightDate] = useState('2026-08-28');
@@ -64,21 +66,19 @@ export default function BookingWizard({ initialType = 'flight_and_bnb', initialR
   const [clientPhone, setClientPhone] = useState('');
 
   useEffect(() => {
-    // Fetch routes and stays for autocomplete & selection
-    fetch('/api/routes')
-      .then((res) => res.json())
+    // Fetch routes and stays for autocomplete & selection using apiClient
+    fetchRoutes()
       .then((data) => {
-        if (data.routes) setRoutes(data.routes);
+        if (data.data) setRoutes(data.data);
       })
       .catch(console.error);
 
-    fetch('/api/stays')
-      .then((res) => res.json())
+    fetchStays()
       .then((data) => {
-        if (data.stays) {
-          setStays(data.stays);
+        if (data.data) {
+          setStays(data.data);
           if (initialStayId) {
-            const match = data.stays.find((s: BnBListing) => s.id === initialStayId);
+            const match = data.data.find((s: BnBListing) => s.id === initialStayId);
             if (match) setSelectedStayId(match.id);
           }
         }
@@ -88,11 +88,12 @@ export default function BookingWizard({ initialType = 'flight_and_bnb', initialR
 
   // Handle route selection matching
   const handleRoutePreset = (routeId: string) => {
+    setSelectedRouteId(routeId);
     const route = routes.find((r) => r.id === routeId);
     if (route) {
       setFlightOrigin(`${route.originName} (${route.originCode})`);
       setFlightDestination(`${route.destName} (${route.destCode})`);
-      if (route.carriers.length > 0) {
+      if (route.carriers && route.carriers.length > 0) {
         setFlightCarrierPreference(route.carriers[0]);
       }
     }
@@ -114,6 +115,7 @@ export default function BookingWizard({ initialType = 'flight_and_bnb', initialR
     try {
       const payload = {
         bookingType,
+        flightRouteId: selectedRouteId || undefined,
         flightOrigin: bookingType !== 'bnb_only' ? flightOrigin : undefined,
         flightDestination: bookingType !== 'bnb_only' ? flightDestination : undefined,
         flightDate: bookingType !== 'bnb_only' ? flightDate : undefined,
@@ -142,16 +144,10 @@ export default function BookingWizard({ initialType = 'flight_and_bnb', initialR
         },
       };
 
-      const res = await fetch('/api/bookings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
+      const data = await createBookingApi(payload);
 
-      const data = await res.json();
-
-      if (!res.ok || !data.success) {
-        throw new Error(data.message || 'Failed to submit booking request.');
+      if (!data.success || !data.booking) {
+        throw new Error('Failed to submit booking request.');
       }
 
       // Celebrate
@@ -164,7 +160,7 @@ export default function BookingWizard({ initialType = 'flight_and_bnb', initialR
 
       setSuccessBooking({
         id: data.booking.id,
-        trackingCode: data.trackingCode,
+        trackingCode: data.booking.trackingCode,
       });
     } catch (err: any) {
       setError(err.message || 'An error occurred. Please try again.');

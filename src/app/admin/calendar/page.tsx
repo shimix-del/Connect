@@ -6,22 +6,23 @@ import TripsCalendar from '@/components/TripsCalendar';
 import RequestDrawer from '@/components/RequestDrawer';
 import { BookingRequest } from '@/types';
 
+import { fetchBookings as getBookingsApi } from '@/lib/apiClient';
+
 export default function AdminCalendarPage() {
   const [bookings, setBookings] = useState<BookingRequest[]>([]);
   const [selectedBooking, setSelectedBooking] = useState<BookingRequest | null>(null);
 
-  const fetchBookings = async () => {
+  const loadBookings = async () => {
     try {
-      const res = await fetch('/api/bookings');
-      const data = await res.json();
-      if (data.bookings) setBookings(data.bookings);
+      const data = await getBookingsApi();
+      if (data.data) setBookings(data.data);
     } catch (err) {
       console.error(err);
     }
   };
 
   useEffect(() => {
-    fetchBookings();
+    loadBookings();
   }, []);
 
   const handleUpdateBooking = (updated: BookingRequest) => {

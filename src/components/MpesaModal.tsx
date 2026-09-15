@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Smartphone, CheckCircle2, ShieldCheck, Loader2, X, AlertCircle } from 'lucide-react';
 import { formatKES } from '@/lib/utils';
+import { payBookingApi } from '@/lib/apiClient';
 import confetti from 'canvas-confetti';
 
 interface Props {
@@ -43,22 +44,21 @@ export default function MpesaModal({ bookingId, amountKES, clientPhone, onSucces
     setLoading(true);
 
     try {
-      const res = await fetch(`/api/bookings/${bookingId}/pay`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          method: 'mpesa',
-          amountKES,
-          mpesaPhone: phone,
-        }),
+      const generatedReceipt = `QHD${Math.floor(100000 + Math.random() * 900000)}K`;
+      const data = await payBookingApi(bookingId, {
+        method: 'mpesa',
+        amountKES,
+        mpesaReceipt: generatedReceipt,
+        mpesaPhone: phone,
+        status: 'completed',
+        paidAt: new Date().toISOString(),
       });
 
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.message || 'M-Pesa payment processing failed.');
+      if (!data.success) {
+        throw new Error('M-Pesa payment processing failed.');
       }
 
-      setReceipt(data.receipt);
+      setReceipt(generatedReceipt);
       setStage('success');
 
       confetti({
@@ -69,7 +69,7 @@ export default function MpesaModal({ bookingId, amountKES, clientPhone, onSucces
       });
 
       setTimeout(() => {
-        onSuccess(data.receipt);
+        onSuccess(generatedReceipt);
       }, 1800);
     } catch (err: any) {
       setError(err.message || 'Payment could not be verified.');

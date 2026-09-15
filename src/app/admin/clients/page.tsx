@@ -5,6 +5,7 @@ import AdminHeader from '@/components/AdminHeader';
 import { Client, BookingRequest } from '@/types';
 import { Users, PhoneCall, Mail, Star, ShieldCheck, Plus, Sparkles, X } from 'lucide-react';
 import { formatKenyanPhone, generateWhatsAppLink } from '@/lib/utils';
+import { fetchClients, fetchBookings, saveClientApi } from '@/lib/apiClient';
 
 export default function AdminClientsPage() {
   const [clients, setClients] = useState<Client[]>([]);
@@ -22,14 +23,12 @@ export default function AdminClientsPage() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [cRes, bRes] = await Promise.all([
-        fetch('/api/clients'),
-        fetch('/api/bookings'),
+      const [cData, bData] = await Promise.all([
+        fetchClients(),
+        fetchBookings(),
       ]);
-      const cData = await cRes.json();
-      const bData = await bRes.json();
-      if (cData.clients) setClients(cData.clients);
-      if (bData.bookings) setBookings(bData.bookings);
+      if (cData.data) setClients(cData.data);
+      if (bData.data) setBookings(bData.data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -46,20 +45,17 @@ export default function AdminClientsPage() {
     if (!clientName || !clientPhone) return;
 
     try {
-      const res = await fetch('/api/clients', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: clientName,
-          email: clientEmail,
-          phone: clientPhone,
-          vipTier: clientVip,
-          notes: clientNotes,
-        }),
+      const data = await saveClientApi({
+        id: `client-${Date.now()}`,
+        name: clientName,
+        email: clientEmail,
+        phone: clientPhone,
+        vipTier: clientVip,
+        notes: clientNotes,
+        createdAt: new Date().toISOString(),
       });
 
-      const data = await res.json();
-      if (data.success) {
+      if (data.success && data.client) {
         setClients([data.client, ...clients]);
         setShowAddClient(false);
         setClientName('');

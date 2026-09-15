@@ -12,6 +12,8 @@ import {
 import { formatKES, formatUSD, getStatusBadge } from '@/lib/utils';
 import Link from 'next/link';
 
+import { fetchBookings, fetchAdminStats } from '@/lib/apiClient';
+
 export default function AdminDashboardPage() {
   const [bookings, setBookings] = useState<BookingRequest[]>([]);
   const [stats, setStats] = useState<AdminStats | null>(null);
@@ -24,15 +26,12 @@ export default function AdminDashboardPage() {
   const fetchData = async (silent = false) => {
     if (!silent) setLoading(true);
     try {
-      const [bookingsRes, statsRes] = await Promise.all([
-        fetch('/api/bookings'),
-        fetch('/api/stats'),
+      const [bData, sData] = await Promise.all([
+        fetchBookings(),
+        fetchAdminStats(),
       ]);
 
-      const bData = await bookingsRes.json();
-      const sData = await statsRes.json();
-
-      if (bData.bookings) setBookings(bData.bookings);
+      if (bData.data) setBookings(bData.data);
       if (sData.stats) setStats(sData.stats);
     } catch (err) {
       console.error('Failed to fetch admin data', err);

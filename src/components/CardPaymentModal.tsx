@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { CreditCard, Lock, CheckCircle2, Loader2, X, AlertCircle } from 'lucide-react';
 import { formatUSD, formatKES } from '@/lib/utils';
+import { payBookingApi } from '@/lib/apiClient';
 import confetti from 'canvas-confetti';
 
 interface Props {
@@ -48,19 +49,16 @@ export default function CardPaymentModal({ bookingId, amountKES, amountUSD, onSu
     setLoading(true);
 
     try {
-      const res = await fetch(`/api/bookings/${bookingId}/pay`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          method: 'card',
-          amountKES,
-          cardLast4: cardNumber.replace(/\s/g, '').slice(-4),
-        }),
+      const data = await payBookingApi(bookingId, {
+        method: 'card',
+        amountKES,
+        cardLast4: cardNumber.replace(/\s/g, '').slice(-4),
+        status: 'completed',
+        paidAt: new Date().toISOString(),
       });
 
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.message || 'Payment processing failed.');
+      if (!data.success) {
+        throw new Error('Payment processing failed.');
       }
 
       setSuccess(true);
@@ -72,7 +70,7 @@ export default function CardPaymentModal({ bookingId, amountKES, amountUSD, onSu
       });
 
       setTimeout(() => {
-        onSuccess(data.receipt);
+        onSuccess(data.booking?.payment?.mpesaReceipt || 'TXN-CARD-SUCCESS');
       }, 1600);
     } catch (err: any) {
       setError(err.message || 'Card authorization failed.');

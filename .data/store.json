@@ -271,6 +271,14 @@
   ],
   "clients": [
     {
+      "id": "client-1787130145814-1wzt",
+      "name": "moha moha",
+      "email": "jerrykha@gmail.com",
+      "phone": "0724659389",
+      "vipTier": "standard",
+      "createdAt": "2026-08-19T09:02:25.814Z"
+    },
+    {
       "id": "client-1787123807022-2cqv",
       "name": "Emmanuel Nyakundi",
       "email": "jerrykhaboy@gmail.com",
@@ -315,6 +323,55 @@
     }
   ],
   "bookings": [
+    {
+      "id": "req-1787130145841",
+      "trackingCode": "KEN-8236Z",
+      "clientId": "client-1787130145814-1wzt",
+      "client": {
+        "id": "client-1787130145814-1wzt",
+        "name": "moha moha",
+        "email": "jerrykha@gmail.com",
+        "phone": "0724659389",
+        "vipTier": "standard",
+        "createdAt": "2026-08-19T09:02:25.814Z"
+      },
+      "bookingType": "flight_and_bnb",
+      "flightOrigin": "Nairobi Wilson (WIL)",
+      "flightDestination": "Maasai Mara (Keekorok / Serena) (MRE)",
+      "flightDate": "2026-08-28",
+      "flightReturnDate": "2026-08-31",
+      "flightIsRoundTrip": true,
+      "flightPax": 1,
+      "flightPreferredTime": "sunset",
+      "flightCarrierPreference": "Kenya Airways",
+      "bnbListingId": "stay-mara-river-suite",
+      "bnbCustomPreference": "Mara Cliffside Safari Suite & Tent Pavilion",
+      "bnbCheckIn": "2026-08-28",
+      "bnbCheckOut": "2026-08-31",
+      "bnbGuests": 1,
+      "bnbBudgetTier": "Ultra-Luxury VIP",
+      "vipAirportTransfer": true,
+      "privateChefRequest": true,
+      "champagneOnArrival": false,
+      "specialRequests": "",
+      "status": "completed",
+      "createdAt": "2026-08-19T09:02:25.841Z",
+      "updatedAt": "2026-08-19T09:05:35.909Z",
+      "quote": {
+        "id": "quote-1787130310170",
+        "flightPriceKES": 15000,
+        "bnbPriceKES": 80000,
+        "conciergeFeeKES": 3000,
+        "totalPriceKES": 98000,
+        "totalPriceUSD": 754,
+        "quotedAirline": "Kenya Airways (Confirmed)",
+        "quotedStayName": "Mara Cliffside Safari Suite & Tent Pavilion",
+        "quoteNotes": "Verified real-time availability with airline desk and villa management.",
+        "validUntil": "2026-08-20T09:05:10.170Z",
+        "sentAt": "2026-08-19T09:05:10.170Z"
+      },
+      "adminNotes": ""
+    },
     {
       "id": "req-1787123807022",
       "trackingCode": "KEN-5390X",

@@ -5,6 +5,7 @@ import AdminHeader from '@/components/AdminHeader';
 import { BnBListing, Route } from '@/types';
 import { Home as HomeIcon, Plane, Plus, Check, Edit2, Trash2, MapPin, Sparkles, X, DollarSign, Bed, Users } from 'lucide-react';
 import { formatKES, formatUSD } from '@/lib/utils';
+import { fetchStays, fetchRoutes, createStayApi, createRouteApi } from '@/lib/apiClient';
 
 export default function AdminInventoryPage() {
   const [activeTab, setActiveTab] = useState<'stays' | 'routes'>('stays');
@@ -38,14 +39,12 @@ export default function AdminInventoryPage() {
   const fetchInventory = async () => {
     setLoading(true);
     try {
-      const [sRes, rRes] = await Promise.all([
-        fetch('/api/stays'),
-        fetch('/api/routes'),
+      const [sData, rData] = await Promise.all([
+        fetchStays(),
+        fetchRoutes(),
       ]);
-      const sData = await sRes.json();
-      const rData = await rRes.json();
-      if (sData.stays) setStays(sData.stays);
-      if (rData.routes) setRoutes(rData.routes);
+      if (sData.data) setStays(sData.data);
+      if (rData.data) setRoutes(rData.data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -62,29 +61,26 @@ export default function AdminInventoryPage() {
     if (!stayTitle || !stayLocation) return;
 
     try {
-      const res = await fetch('/api/stays', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: stayTitle,
-          location: stayLocation,
-          region: stayRegion,
-          pricePerNightKES: Number(stayPriceKES),
-          bedrooms: Number(stayBedrooms),
-          bathrooms: Number(stayBedrooms),
-          maxGuests: Number(stayGuests),
-          description: stayDescription || 'Luxury private estate.',
-          ownerName: stayOwnerName || 'Host Management',
-          ownerPhone: stayOwnerPhone || '+254700000000',
-          photos: [stayPhotoUrl],
-          amenities: ['Private Chef Included', 'Oceanview Pool', 'Starlink WiFi'],
-          active: true,
-          featured: true,
-        }),
+      const data = await createStayApi({
+        id: `stay-${Date.now()}`,
+        title: stayTitle,
+        location: stayLocation,
+        region: stayRegion,
+        pricePerNightKES: Number(stayPriceKES),
+        pricePerNightUSD: Math.round(Number(stayPriceKES) / 130),
+        bedrooms: Number(stayBedrooms),
+        bathrooms: Number(stayBedrooms),
+        maxGuests: Number(stayGuests),
+        description: stayDescription || 'Luxury private estate.',
+        ownerName: stayOwnerName || 'Host Management',
+        ownerPhone: stayOwnerPhone || '+254700000000',
+        photos: [stayPhotoUrl],
+        amenities: ['Private Chef Included', 'Oceanview Pool', 'Starlink WiFi'],
+        active: true,
+        featured: true,
       });
 
-      const data = await res.json();
-      if (data.success) {
+      if (data.success && data.stay) {
         setStays([data.stay, ...stays]);
         setShowAddStay(false);
         setStayTitle('');
@@ -101,23 +97,20 @@ export default function AdminInventoryPage() {
 
     try {
       const carriersArr = routeCarriers.split(',').map((c) => c.trim()).filter(Boolean);
-      const res = await fetch('/api/routes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          originName,
-          originCode,
-          destName,
-          destCode: destCode.toUpperCase(),
-          carriers: carriersArr,
-          estimatedDuration: routeDuration,
-          basePriceKES: Number(routePriceKES),
-          featured: true,
-        }),
+      const data = await createRouteApi({
+        id: `route-${originCode.toLowerCase()}-${destCode.toLowerCase()}-${Date.now()}`,
+        originName,
+        originCode,
+        destName,
+        destCode: destCode.toUpperCase(),
+        carriers: carriersArr,
+        estimatedDuration: routeDuration,
+        basePriceKES: Number(routePriceKES),
+        basePriceUSD: Math.round(Number(routePriceKES) / 130),
+        featured: true,
       });
 
-      const data = await res.json();
-      if (data.success) {
+      if (data.success && data.route) {
         setRoutes([data.route, ...routes]);
         setShowAddRoute(false);
         setDestName('');

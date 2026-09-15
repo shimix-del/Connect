@@ -1,10 +1,11 @@
 # Aero & Stay Kenya ✈️ 🏨
 ### Private Flight + Luxury Stay Concierge Booking Platform
 
-[![CI/CD Pipeline](https://github.com/shimix-del/Connect/actions/workflows/ci.yml/badge.svg)](https://github.com/shimix-del/Connect/actions/workflows/ci.yml)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=shimix-del/Connect)
+[![GitHub Pages](https://github.com/shimix-del/Connect/actions/workflows/deploy-pages.yml/badge.svg)](https://shimix-del.github.io/Connect/)
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/shimix-del/Connect)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=shimix-del/Connect)
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/shimix-del/Connect)
+[![CI/CD Pipeline](https://github.com/shimix-del/Connect/actions/workflows/ci.yml/badge.svg)](https://github.com/shimix-del/Connect/actions/workflows/ci.yml)
 [![Next.js](https://img.shields.io/badge/Next.js-14.2-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 [![Docker Ready](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker)](https://github.com/shimix-del/Connect/pkgs/container/connect)
@@ -13,25 +14,29 @@ A full-stack, bespoke luxury concierge booking platform built for high-end domes
 
 ---
 
-## 🚀 Running & Deploying from GitHub
+## 🚀 1-Click Go Live & Deployment Options
 
-You can run, test, and deploy this system directly on or via GitHub in several ways:
+### 🟢 1. Go Live on GitHub Pages (Direct from GitHub)
+You can deploy and host the site live on GitHub at `https://shimix-del.github.io/Connect/` with 1 click:
 
-### ⚡ 1. Run Directly in GitHub (Codespaces - 1 Click)
-Run the entire application in your browser inside GitHub without installing anything locally:
-
-1. Click the **[Open in GitHub Codespaces](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=shimix-del/Connect)** button or navigate to **Code** > **Codespaces** > **Create codespace on main**.
-2. GitHub will automatically set up the container, install dependencies, and launch the dev server.
-3. Port `3000` will automatically forward and open the live web app preview.
+1. In your GitHub repository, go to **[Actions > Deploy to GitHub Pages](https://github.com/shimix-del/Connect/actions/workflows/deploy-pages.yml)**.
+2. Click **Run workflow** > select `main` > click **Run workflow**.
+3. Once completed (approx. 45s), your site is live at:
+   👉 **`https://shimix-del.github.io/Connect/`**
+4. *(One-time setup in GitHub settings)*: Go to **Settings** > **Pages** > under **Build and deployment** select **Source: GitHub Actions**.
 
 ---
 
-### 🌐 2. Deploy to Vercel (Recommended Cloud Hosting)
-Because this is a Next.js 14 full-stack app with dynamic API endpoints (`/api/...`), Vercel provides zero-configuration serverless deployment directly from your GitHub repository:
+### ⚡ 2. Run Directly in GitHub Browser (Codespaces)
+1. Click **[Open in GitHub Codespaces](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=shimix-del/Connect)**.
+2. GitHub launches the full dev server in the cloud and opens port 3000 in your browser.
 
+---
+
+### 🌐 3. Deploy Live with Vercel (Recommended Serverless Hosting)
 1. Click **[Deploy with Vercel](https://vercel.com/new/clone?repository-url=https://github.com/shimix-del/Connect)**.
-2. Sign in with GitHub and select your repository (`shimix-del/Connect`).
-3. Click **Deploy**. Vercel will automatically build and assign a global HTTPS URL with automatic preview deployments on every pull request.
+2. Select your repository `shimix-del/Connect` and click **Deploy**.
+3. In under 1 minute, your site is live on a custom `.vercel.app` domain with full backend API support.
 
 ---
 
