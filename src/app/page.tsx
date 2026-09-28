@@ -10,7 +10,7 @@ import {
   ArrowRight, PhoneCall, CheckCircle2, ChevronRight, MapPin, Compass 
 } from 'lucide-react';
 
-export const revalidate = 0; // Fresh dynamic data
+export const dynamic = 'force-static';
 
 export default function HomePage() {
   const stays = getStays();

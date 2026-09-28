@@ -4,7 +4,7 @@ import FeaturedRoutes from '@/components/FeaturedRoutes';
 import { Plane, Sparkles, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 
-export const revalidate = 0;
+export const dynamic = 'force-static';
 
 export default function RoutesPage() {
   const routes = getRoutes();
